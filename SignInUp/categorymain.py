@@ -1,17 +1,9 @@
-from kivy.base import runTouchApp
-from kivy.uix.spinner import Spinner
 from kivy.lang import Builder
 from kivy.app import App
-from kivy.uix.actionbar import ActionBar, ActionButton
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.popup import Popup
-from kivy.uix.label import Label
-from kivy.uix.listview import ListItemButton, ListView
-from kivy.uix.dropdown import DropDown
-from kivy.uix.button import Button
-from kivy.properties import ObjectProperty
 import sqlite3
-from kivy.adapters.listadapter import ListAdapter
+from MainUI.UserLogin import Login
 
 Builder.load_string('''
 <profile>:
@@ -66,7 +58,9 @@ Builder.load_string('''
                         text: 'Btn0'
                         icon: 'plus1.png'
                         halign: 'left'
-                        on_press: root.select()
+                        on_press:
+                            root.select()
+
 
                     ActionButton:
                         text: 'Btn1'
@@ -159,6 +153,11 @@ Builder.load_string('''
         ''')
 class SelectPopup(Popup):
     def add(self, x):
+        conn = sqlite3.connect('booksrecommender.db')
+        cursor = conn.cursor()
+        # cursor.execute("INSERT INTO UserPreferences VALUES (NULL, ?, ? )", (username, password));
+        conn.commit()
+
         print(x)
 
 
@@ -166,45 +165,8 @@ class profile(Screen):
     def select(self):
         SelectPopup().open()
 
-
-
-
-
-
-    # dropbtn= ObjectProperty()
-    #
-    # def open(self):
-    #     dropdown = DropDown()
-    #     dropdown.auto_width= False
-    #
-    #     items = ['Juvenile Fiction', 'Young Adult\nFiction', 'Performing Arts', 'Drama', 'Literary Criticism',
-    #              'Children', 'Contests',
-    #              'Law', 'Social Science', 'Study Aids', 'Juvenile\nNonfiction', 'Biography\n& Autobiography',
-    #              'Business\n& Economics', 'Man-woman\nrelationships',
-    #              'History', 'Psychology', 'Pressure vessels', 'Architecture', 'Rivets and\nriveting',
-    #              'Technology\n& Engineering', 'Stream\nmeasurements']
-    #
-    #     for item in items:
-    #         btn = Button(text= item, size_hint_y=None, height=40, size_hint_x=2, width= 200, font_size= '12sp')
-    #         dropdown.add_widget(btn)
-    #
-    #     actionBtn= self.dropbtn
-    #     actionBtn.bind(on_release= dropdown.open)
-    #
-    #
-    # def add(self):
-    #     popup = Popup(title="Information", content=Label(text="Welcome"), size_hint=(None, None), size=(400, 200))
-    #     popup.open()
-    #     # conn = sqlite3.connect('booksrecommender.db')
-
-
-
-
-
-
-
-
-
+        user= Login.getUsername(self)
+        print(user)
 
 class TestApp(App):
     def build(self):
