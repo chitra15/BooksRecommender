@@ -3,7 +3,7 @@ from math import sqrt
 
 class CF:
     #initialise class variables
-    def __init__(self, reviews, max_num_recommendation=5, k=1): #k = value for KNN
+    def __init__(self, reviews, max_num_recommendation=100, k=1): #k = value for KNN
         self.reviews = reviews
         self.max_num_recommendation = max_num_recommendation
         self.k = k
@@ -21,13 +21,14 @@ class CF:
     def openDataset(self, location=''):
         self.reviews = {}
         ctr = 0
-        file = codecs.open(location + "BX-Book-Ratings.csv", 'r', 'latin-1') #load book ratings into self.reviews
+        file = codecs.open(location + "reduce_rating_w_0.csv", 'r', 'latin-1') #load book ratings into self.reviews
         for line in file:
             ctr += 1
             col = line.split(';')
-            user_id = col[0].strip('"')
-            isbn = col[1].strip('"')
-            rating = int(col[2].strip().strip('""",,'))
+            user_id = col[0]
+            isbn = col[1]
+            rating = int(col[2])
+            # rating = int(col[2].split().split('\r\n'))
             # print ("\n"+ user + " {" + book + ": " + rating + "}\n")
             if user_id in self.reviews:
                 currentRatings = self.reviews[user_id]
@@ -37,17 +38,17 @@ class CF:
             self.reviews[user_id] = currentRatings
         file.close()
 
-        file = codecs.open(location + "BX-Books.csv", 'r', 'latin-1')
+        file = codecs.open(location + "books_cf.csv", 'r', 'latin-1')
         for line in file:
             ctr += 1
             col = line.split(';')
-            isbn = col[0].strip('"')
-            bk_title = col[1].strip('"')
-            author = col[2].strip().strip('"')
-            bk_title = bk_title + ' by ' + author
+            isbn = col[0]
+            bk_title = col[1]
+            # author = col[2].strip().strip('"')
+            # bk_title = bk_title + ' by ' + author
             self.ISBN_title_conv[isbn] = bk_title
         file.close()
-        print(ctr)
+        # print(ctr)
 
 
     #determine how similar 2 users' are
@@ -86,7 +87,7 @@ class CF:
             if row != user_id:
                 dist = self.fn(self.reviews[user_id], self.reviews[row])
                 dist_to_user.append((row, dist))
-        dist_to_user.sort(key=lambda artistTuple: artistTuple[1], reverse=True) #sort dist_to_user array
+        dist_to_user.sort(key=lambda artistTuple: artistTuple[1], reverse=True) #sort dist_to_user array'
         return dist_to_user
 
 
@@ -110,6 +111,8 @@ class CF:
                         list_recommendations[book] = (list_recommendations[book] + ratings_of_neighbor[book] * weight)
 
         list_recommendations = list(list_recommendations.items())
-        list_recommendations = [(self.ISBN_Title(k), v) for (k, v) in list_recommendations]
+        # list_recommendations = [(k, v) for (k, v) in list_recommendations]
+        list_recommendations = [k for (k, v) in list_recommendations]
+
         list_recommendations.sort(key=lambda bookRow: bookRow[1], reverse=True)
         return list_recommendations[:self.max_num_recommendation] #return n books
